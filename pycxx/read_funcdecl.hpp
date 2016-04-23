@@ -11,11 +11,7 @@ namespace pycxx
 	template<>
 	inline auto TokenStream::read<ast::ParamDecl>() -> ast::ParamDecl
 	{
-		auto p = ast::ParamDecl{};
-		p.name = read_label();
-
-		if (try_match(":"))
-			p.type = read<ast::Expr>();
+		auto p = ast::ParamDecl{read<ast::TypedPat>()};
 
 		if (try_match("="))
 			p.default_value = read<ast::Expr>();

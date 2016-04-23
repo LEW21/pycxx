@@ -48,7 +48,7 @@ namespace pycxx
 	template<>
 	inline auto TokenStream::read<ast::Exprs>() -> ast::Exprs
 	{
-		auto p = ast::Exprs{};
+		auto&& p = ast::Exprs{};
 		while (!is_end())
 		{
 			p.emplace_back(read<ast::Expr>());

@@ -98,6 +98,31 @@ namespace pycxx
 		inline bool operator==(const Property& a, const Property& b) { return a.self == b.self && a.name == b.name; }
 		inline bool operator!=(const Property& a, const Property& b) { return !(a == b); }
 
+		// Patterns -----------------------------------------------------------
+		struct PatIdent;
+		struct PatTuple;
+
+		using Pat = xx::variant<PatIdent, PatTuple>;
+		using Pats = vector<Pat>;
+
+		struct PatIdent
+		{
+			bool is_ref = false;
+			bool is_mutable = false;
+			string name;
+		};
+
+		struct PatTuple
+		{
+			indirect<Pats> idents;
+		};
+
+		inline bool operator==(const PatIdent& a, const PatIdent& b) { return a.name == b.name && a.is_mutable == b.is_mutable && a.is_ref == b.is_ref; }
+		inline bool operator!=(const PatIdent& a, const PatIdent& b) { return !(a == b); }
+
+		inline bool operator==(const PatTuple& a, const PatTuple& b) { return a.idents == b.idents; }
+		inline bool operator!=(const PatTuple& a, const PatTuple& b) { return !(a == b); }
+
 		// Statements ---------------------------------------------------------
 		struct Pass;
 		struct FuncDecl;
@@ -111,18 +136,21 @@ namespace pycxx
 		{
 		};
 
+		struct TypedPat
+		{
+			Pat pat;
+			optional<Expr> type;
+		};
+
 		struct LetDecl
 		{
-			bool is_mutable = false;
-			vector<string> names;
-			optional<Expr> type;
+			TypedPat pat;
 			optional<Expr> value;
 		};
 
 		struct ParamDecl
 		{
-			string name;
-			optional<Expr> type;
+			TypedPat pat;
 			optional<Expr> default_value;
 		};
 
@@ -145,10 +173,13 @@ namespace pycxx
 		inline bool operator==(const Pass&, const Pass&) { return true; }
 		inline bool operator!=(const Pass& a, const Pass& b) { return !(a == b); }
 
-		inline bool operator==(const ParamDecl& a, const ParamDecl& b) { return a.name == b.name && a.type == b.type; }
+		inline bool operator==(const TypedPat& a, const TypedPat& b) { return a.pat == b.pat && a.type == b.type; }
+		inline bool operator!=(const TypedPat& a, const TypedPat& b) { return !(a == b); }
+
+		inline bool operator==(const ParamDecl& a, const ParamDecl& b) { return a.pat == b.pat && a.default_value == b.default_value; }
 		inline bool operator!=(const ParamDecl& a, const ParamDecl& b) { return !(a == b); }
 
-		inline bool operator==(const LetDecl& a, const LetDecl& b) { return a.is_mutable == b.is_mutable && a.names == b.names && a.type == b.type && a.value == b.value; }
+		inline bool operator==(const LetDecl& a, const LetDecl& b) { return a.pat == b.pat && a.value == b.value; }
 		inline bool operator!=(const LetDecl& a, const LetDecl& b) { return !(a == b); }
 
 		inline bool operator==(const FuncDecl& a, const FuncDecl& b) { return a.is_mutable == b.is_mutable && a.name == b.name && a.params == b.params && a.return_type == b.return_type && a.code == b.code; }

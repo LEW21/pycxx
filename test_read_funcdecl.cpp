@@ -6,6 +6,9 @@ using pycxx::ast::FuncDecl;
 using pycxx::ast::Pass;
 using pycxx::ast::Block;
 using pycxx::ast::Expr;
+using pycxx::ast::PatIdent;
+using pycxx::ast::PatTuple;
+using pycxx::ast::TypedPat;
 using pycxx::nullopt;
 using pycxx::ast::operator ""_id;
 using pycxx::ast::operator ""_expr;
@@ -16,7 +19,7 @@ void test_func()
 		FuncDecl{
 			false,
 			"x",
-			{{"typed", Expr{"int"_id}}, {"generic"}},
+			{{TypedPat{PatIdent{false, false, "typed"}, Expr{"int"_id}}}, {{PatIdent{false, false, "generic"}}}},
 			nullopt,
 			Block{Pass{}}
 		}

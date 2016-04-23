@@ -2,6 +2,8 @@
 
 #include "token_stream.hpp"
 
+#include "ast.hpp"
+
 namespace pycxx
 {
 	template<>

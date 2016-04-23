@@ -74,13 +74,15 @@ void translate_block(CXXWriter& out, ast::Block block)
 	{
 		if (s.is<ast::FuncDecl>())
 		{
+			// TODO support param deconstruction
+
 			auto&& f = s.get<ast::FuncDecl>();
 
 			auto&& auto_params = vector<string>{};
 			for (auto&& param : f.params)
 			{
-				if (!param.type)
-					auto_params.emplace_back(param.name);
+				if (!param.pat.type)
+					auto_params.emplace_back(param.pat.pat.get<ast::PatIdent>().name);
 			}
 
 			if (auto_params.size())
@@ -96,11 +98,11 @@ void translate_block(CXXWriter& out, ast::Block block)
 				else
 					cxx += ", ";
 
-				if (param.type)
-					cxx += translate_expr(*param.type);
+				if (param.pat.type)
+					cxx += translate_expr(*param.pat.type);
 				else
-					cxx += "T" + param.name + "&&";
-				cxx += " " + param.name;
+					cxx += "T" + param.pat.pat.get<ast::PatIdent>().name + "&&";
+				cxx += " " + param.pat.pat.get<ast::PatIdent>().name;
 
 				if (param.default_value)
 					cxx += " = " + translate_expr(*param.default_value);
@@ -129,7 +131,7 @@ void translate_block(CXXWriter& out, ast::Block block)
 
 			assert(l.value); // TODO handle value-less lets
 
-			if (l.names.size() > 1 && l.value)
+			if (l.pat.pat.is<ast::PatTuple>())
 			{
 				// Convert
 				// let (a, b, c) = (1, 2, 3)
@@ -139,28 +141,20 @@ void translate_block(CXXWriter& out, ast::Block block)
 				// auto&& b = std::get<1>(temp);
 				// auto&& c = std::get<2>(temp);
 			}
+
+			auto&& pat = l.pat.pat.get<ast::PatIdent>();
+
 			auto&& cxx = string{};
-			cxx += "auto&& ";
-
-			bool first = true;
-			for (auto&& name : l.names)
-			{
-				if (first)
-					first = false;
-				else
-					cxx += ", ";
-
-				cxx += name + " = ";
-				if (!l.is_mutable)
-					cxx += "pycxx_runtime::freeze(";
-				if (l.type)
-					cxx += translate_expr(*l.type) + "(";
-				cxx += translate_expr(*l.value);
-				if (l.type)
-					cxx += ")";
-				if (!l.is_mutable)
-					cxx += ")";
-			}
+			cxx += "auto&& " + pat.name + " = ";
+			if (!pat.is_mutable)
+				cxx += "pycxx_runtime::freeze(";
+			if (l.pat.type)
+				cxx += translate_expr(*l.pat.type) + "{";
+			cxx += translate_expr(*l.value);
+			if (l.pat.type)
+				cxx += "}";
+			if (!pat.is_mutable)
+				cxx += ")";
 
 			out.write(cxx + ";");
 		}

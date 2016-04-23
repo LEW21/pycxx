@@ -2,8 +2,7 @@
 
 #include "token_stream.hpp"
 
-#include "read_brackets.hpp"
-#include "read_block.hpp"
+#include "read_pat.hpp"
 #include "read_expr.hpp"
 
 namespace pycxx
@@ -29,16 +28,7 @@ namespace pycxx
 	{
 		match("let");
 
-		auto&& l = ast::LetDecl{};
-		l.is_mutable = try_match("mut");
-
-		do
-		{
-			l.names.emplace_back(read_label());
-		} while (try_match(","));
-
-		if (try_match(":"))
-			l.type = read<ast::Expr>();
+		auto&& l = ast::LetDecl{read<ast::TypedPat>()};
 
 		if (try_match("="))
 			l.value = read<ast::Expr>();
