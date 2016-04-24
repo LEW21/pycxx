@@ -158,6 +158,34 @@ void translate_block(CXXWriter& out, ast::Block block)
 
 			out.write(cxx + ";");
 		}
+		else if (s.is<ast::Loop>())
+		{
+			auto&& l = s.get<ast::Loop>();
+
+			out.write("for (;;)");
+			out.begin();
+			if (l.code)
+				translate_block(out, *l.code);
+			out.end();
+		}
+		else if (s.is<ast::ForLoop>())
+		{
+			auto&& l = s.get<ast::ForLoop>();
+
+			if (l.pat.pat.is<ast::PatTuple>())
+			{
+				// TODO
+			}
+
+			auto&& pat = l.pat.pat.get<ast::PatIdent>();
+
+			out.write("for (auto&& " + pat.name + " : " + translate_expr(l.expr) + ")");
+
+			out.begin();
+			if (l.code)
+				translate_block(out, *l.code);
+			out.end();
+		}
 		else if (s.is<ast::ExprStatement>())
 		{
 			auto&& expr = s.get<ast::ExprStatement>().expr;

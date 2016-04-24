@@ -6,6 +6,7 @@
 #include "read_pass.hpp"
 #include "read_letdecl.hpp"
 #include "read_funcdecl.hpp"
+#include "read_loop.hpp"
 
 namespace pycxx
 {
@@ -20,6 +21,12 @@ namespace pycxx
 
 		if (is<ast::FuncDecl>())
 			return read<ast::FuncDecl>();
+
+		if (is<ast::Loop>())
+			return read<ast::Loop>();
+
+		if (is<ast::ForLoop>())
+			return read<ast::ForLoop>();
 
 		return read<ast::ExprStatement>();
 	}

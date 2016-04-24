@@ -127,9 +127,11 @@ namespace pycxx
 		struct Pass;
 		struct FuncDecl;
 		struct LetDecl;
+		struct Loop;
+		struct ForLoop;
 		struct ExprStatement;
 
-		using Statement = xx::variant<Pass, LetDecl, FuncDecl, ExprStatement>;
+		using Statement = xx::variant<Pass, LetDecl, FuncDecl, Loop, ForLoop, ExprStatement>;
 		using Block = vector<Statement>;
 
 		struct Pass
@@ -173,7 +175,7 @@ namespace pycxx
 		struct ForLoop
 		{
 			TypedPat pat;
-			Expr value;
+			Expr expr;
 			indirect<Block> code;
 		};
 
@@ -200,7 +202,7 @@ namespace pycxx
 		inline bool operator==(const Loop& a, const Loop& b) { return a.code == b.code; }
 		inline bool operator!=(const Loop& a, const Loop& b) { return !(a == b); }
 
-		inline bool operator==(const ForLoop& a, const ForLoop& b) { return  a.pat == b.pat && a.value == b.value && a.code == b.code; }
+		inline bool operator==(const ForLoop& a, const ForLoop& b) { return  a.pat == b.pat && a.expr == b.expr && a.code == b.code; }
 		inline bool operator!=(const ForLoop& a, const ForLoop& b) { return !(a == b); }
 
 		inline bool operator==(const ExprStatement& a, const ExprStatement& b) { return a.expr == b.expr; }
