@@ -3,7 +3,9 @@
 #include "token_stream.hpp"
 
 #include "read_brackets.hpp"
+#include "read_vector.hpp"
 #include "read_block.hpp"
+#include "read_pat.hpp"
 #include "read_expr.hpp"
 
 namespace pycxx
@@ -22,12 +24,7 @@ namespace pycxx
 	template<>
 	inline auto TokenStream::read<ast::ParamDecls>() -> ast::ParamDecls
 	{
-		auto p = ast::ParamDecls{};
-		do
-		{
-			p.emplace_back(read<ast::ParamDecl>());
-		} while (try_match(","));
-		return p;
+		return read_vector<ast::ParamDecl>(*this);
 	}
 
 	template<>

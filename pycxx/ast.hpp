@@ -165,6 +165,18 @@ namespace pycxx
 			indirect<Block> code;
 		};
 
+		struct Loop
+		{
+			indirect<Block> code;
+		};
+
+		struct ForLoop
+		{
+			TypedPat pat;
+			Expr value;
+			indirect<Block> code;
+		};
+
 		struct ExprStatement
 		{
 			Expr expr;
@@ -184,6 +196,12 @@ namespace pycxx
 
 		inline bool operator==(const FuncDecl& a, const FuncDecl& b) { return a.is_mutable == b.is_mutable && a.name == b.name && a.params == b.params && a.return_type == b.return_type && a.code == b.code; }
 		inline bool operator!=(const FuncDecl& a, const FuncDecl& b) { return !(a == b); }
+
+		inline bool operator==(const Loop& a, const Loop& b) { return a.code == b.code; }
+		inline bool operator!=(const Loop& a, const Loop& b) { return !(a == b); }
+
+		inline bool operator==(const ForLoop& a, const ForLoop& b) { return  a.pat == b.pat && a.value == b.value && a.code == b.code; }
+		inline bool operator!=(const ForLoop& a, const ForLoop& b) { return !(a == b); }
 
 		inline bool operator==(const ExprStatement& a, const ExprStatement& b) { return a.expr == b.expr; }
 		inline bool operator!=(const ExprStatement& a, const ExprStatement& b) { return !(a == b); }

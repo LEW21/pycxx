@@ -2,6 +2,7 @@
 
 #include "token_stream.hpp"
 
+#include "read_vector.hpp"
 #include "read_brackets.hpp"
 #include "read_expr.hpp"
 
@@ -37,14 +38,7 @@ namespace pycxx
 	template<>
 	inline auto TokenStream::read<ast::Pats>() -> ast::Pats
 	{
-		auto&& p = ast::Pats{};
-		while (!is_end())
-		{
-			p.emplace_back(read<ast::Pat>());
-			if (!try_match(","))
-				break;
-		}
-		return p;
+		return read_vector<ast::Pat>(*this);
 	}
 
 	template<>
